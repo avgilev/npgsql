@@ -408,10 +408,15 @@ where
   ""CONSTRAINT_TYPE"",
   pgc.condeferrable as ""IS_DEFERRABLE"",
   pgc.condeferred as ""INITIALLY_DEFERRED""
+, current_database() as referenced_table_catalog
+, fn.nspname as referenced_table_schema
+, ft.relname as referenced_table_name
 from pg_catalog.pg_constraint pgc
 inner join pg_catalog.pg_namespace pgn on pgc.connamespace = pgn.oid
 inner join pg_catalog.pg_class pgt on pgc.conrelid = pgt.oid
 inner join pg_catalog.pg_namespace pgtn on pgt.relnamespace = pgtn.oid
+left join pg_class ft on ft.oid = pgc.confrelid and ft.relkind = 'r'
+left join pg_namespace fn on fn.oid = ft.relnamespace
 inner join (
 select 'PRIMARY KEY' as ""CONSTRAINT_TYPE"", 'p' as ""contype"" union all
 select 'FOREIGN KEY' as ""CONSTRAINT_TYPE"", 'f' as ""contype"" union all
@@ -446,12 +451,18 @@ select 'UNIQUE KEY' as ""CONSTRAINT_TYPE"", 'u' as ""contype""
     n.nspname as table_schema,
     t.relname as table_name,
     a.attname as column_name,
-    a.attnum as ordinal_number,
-    mapping_table.constraint_type
+    cc.i as ordinal_position,
+    mapping_table.constraint_type,
+    fa.attname as referenced_column_name,
+    fcc.i as referenced_ordinal_position
 from pg_constraint c
 inner join pg_namespace n on n.oid = c.connamespace
 inner join pg_class t on t.oid = c.conrelid and t.relkind = 'r'
-inner join pg_attribute a on t.oid = a.attrelid and a.attnum = ANY(c.conkey)
+cross join unnest(c.conkey) with ordinality as cc(num,i)
+inner join pg_attribute a on t.oid = a.attrelid and a.attnum = cc.num
+left join unnest (c.confkey) with ordinality as fcc(num, i) on cc.i = fcc.i
+left join pg_class ft on ft.oid = c.confrelid and ft.relkind = 'r'
+left join pg_attribute fa on ft.oid = fa.attrelid and fa.attnum = fcc.num
 inner join (
 select 'PRIMARY KEY' as constraint_type, 'p' as contype union all
 select 'FOREIGN KEY' as constraint_type, 'f' as contype union all

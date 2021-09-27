@@ -142,6 +142,9 @@
         <Property name="CONSTRAINT_TYPE" />
         <Property name="IS_DEFERRABLE" />
         <Property name="INITIALLY_DEFERRED" />
+        <Property name="referenced_table_catalog" />
+        <Property name="referenced_table_schema" />
+        <Property name="referenced_table_name" />
       </Properties>
       <Services>
         <Service type="IVsDataObjectSelector" implementationType="Microsoft.VisualStudio.Data.Framework.AdoDotNet.AdoDotNetObjectSelector">
@@ -193,6 +196,8 @@
         <Property name="constraint_catalog" isIdentifierPart="true" />
         <Property name="constraint_schema" isIdentifierPart="true" />
         <Property name="constraint_name" isIdentifierPart="true" />
+        <Property name="referenced_column_name" />
+        <Property name="referenced_ordinal_position" type="System.Int32" />
       </Properties>
       <Services>
         <Service type="IVsDataObjectSelector" implementationType="Microsoft.VisualStudio.Data.Framework.AdoDotNet.AdoDotNetObjectSelector">
@@ -424,6 +429,9 @@
       </Identifier>
       <Properties>
         <Property name="Name" isIdentifierPart="true" />
+        <Property name="ReferencedTableCatalog" underlyingMember="referenced_table_catalog" />
+        <Property name="ReferencedTableSchema" underlyingMember="referenced_table_schema" />
+        <Property name="ReferencedTableName" underlyingMember="referenced_table_name" />
       </Properties>
     </MappedType>
     <MappedType name="TableForeignKeyColumn" underlyingType="ConstraintColumns">
@@ -438,6 +446,8 @@
       <Properties>
         <Property name="Name" isIdentifierPart="true" />
         <Property name="Ordinal" underlyingMember="ordinal_position" />
+        <Property name="ReferencedTableColumn" underlyingMember="referenced_column_name" />
+        <Property name="ReferencedColumnOrdinal" underlyingMember="referenced_ordinal_position" />
         <!--Property name="ReferencedColumn">
           <Conversion>
             <CallMapper implementationType="" />
